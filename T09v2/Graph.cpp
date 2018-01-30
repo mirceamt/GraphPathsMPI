@@ -5,6 +5,8 @@
 
 using namespace std;
 
+Graph* Graph::m_instance;
+
 Graph::Graph()  {}
 
 Graph* Graph::GetInstance()

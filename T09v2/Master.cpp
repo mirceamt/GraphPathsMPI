@@ -1,6 +1,7 @@
 #include "Master.h"
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <Windows.h>
 #include "Graph.h"
 #include "CommonUtils.h"
@@ -15,19 +16,24 @@ Master::Master(int rank) :
 
 void Master::Init()
 {
-
+	cout << "Initalized master process with rank " << m_rank << "\n";
+	cout.flush();
 }
 
 void Master::Run()
 {
+	cout << "Entered Master::Run from master with rank " << m_rank << "\n";
+	cout.flush();
 	int option = -1;
 	while (option != 0)
 	{
-		ClearScreen();
 		ShowMenu();
 		cin >> option;
+		BroadcastOption(option);
 		switch(option)
 		{
+		case 0:
+			break;
 		case 1: 
 			InitGraph();
 			break;
@@ -35,40 +41,42 @@ void Master::Run()
 			FindAllPaths();
 			break;
 		case 3:
-			FindShortestPath();
+			//FindShortestPath();
 			break;
 		case 4:
-			FindLongestPath();
+			//FindLongestPath();
 			break;
 		default:
 			break;
 		}
+		ClearScreen();
+
 	}
 }
 
 void Master::CleanUp()
 {
-
+	Log("Exiting process " + CommonUtils::IntToString(m_rank));
 }
 
 void Master::InitGraph()
 {
+	Log("Entered InitGraph");
+
 	m_graph->Reset();
+	Log("Reseted graph");
+
 	int message[4];
 	memset(message, 0, 4 * sizeof(int));
-	message[0] = -1; // -1 means that we are sending a menu option 
-	message[1] = 1; // message[1] is the chosen option
-	int error = MPI_Bcast(message, 2, MPI_INT, m_rank, MPI_COMM_WORLD); // m_rank should always be 0 as this code runs in the master process
-	if (error != MPI_SUCCESS)
-	{
-		CommonUtils::ShowError(error, "Error broadcasting \"-1, 1\" from Master in InitGraph");
-		exit(0);
-	}
 
-	ClearScreen();
-	ShowInitGraphText();
+	ifstream auxHelp("..\\Resources\\inputFileName.txt");
 	char a[MAX_PATH];
-	cin.getline(a, MAX_PATH);
+	auxHelp.getline(a, MAX_PATH);
+	auxHelp.close();
+	Log(string("!!!!!!!!") + a);
+	ClearScreen();
+	ShowInitGraphText(a);
+
 	ifstream inputFile(a);
 	
 	int nrLines;
@@ -87,6 +95,23 @@ void Master::InitGraph()
 
 		m_graph->AddEdgeAndNodes(streetNumber, crossStreet1, crossStreet2, streetType);
 	}
+	inputFile.close();
+
+	Log("Exited InitGraph");
+}
+
+void Master::BroadcastOption(int option)
+{
+	int message[2];
+	memset(message, 0, 2 * sizeof(int));
+	message[0] = -1; // -1 means that we are sending a menu option 
+	message[1] = option; // message[1] is the chosen option
+	int error = MPI_Bcast(message, 2, MPI_INT, m_rank, MPI_COMM_WORLD); // m_rank should always be 0 as this code runs in the master process
+	if (error != MPI_SUCCESS)
+	{
+		CommonUtils::ShowError(error, "Error broadcasting \"-1, 1\" from Master in InitGraph");
+		exit(0);
+	}
 }
 
 void Master::FindAllPaths()
@@ -95,9 +120,10 @@ void Master::FindAllPaths()
 }
 
 
-void Master::ShowInitGraphText()
+void Master::ShowInitGraphText(char *s)
 {
-	cout << "\n\tInsert init path: ";
+	cout << "\nReading from init path: " << s << "\n";
+	cout.flush();
 }
 
 void Master::ShowMenu()
@@ -111,12 +137,23 @@ void Master::ShowMenu()
 	cout << "\n\t4. Drumul maxim";
 	cout << "\n\n\t0. Iesire";
 	cout << "\n\n\n  Alegeti o optiune: ";
+	cout.flush();
+}
+
+void Master::Log(string s)
+{
+	cout << "Master " << m_rank << ": ";
+	cout << s;
+	cout << "\n";
+	cout.flush();
 }
 
 void Master::ClearScreen()
 {
-	for (int i = 1; i <= 100; ++i)
+	for (int i = 1; i <= 10; ++i)
 	{
 		cout << "\n";
 	}
+	cout.flush();
+	//system("CLS");
 }

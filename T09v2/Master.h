@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class Graph;
 
@@ -11,8 +12,11 @@ public:
 	void CleanUp();
 	void InitGraph();
 	void FindAllPaths();
+	void Log(std::string s);
+
 private:
-	void ShowInitGraphText();
+	void BroadcastOption(int option);
+	void ShowInitGraphText(char *s);
 	void ShowMenu();
 	void ClearScreen();
 	Graph* m_graph;

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class Graph;
 
@@ -10,7 +11,7 @@ public:
 	void Run();
 	void CleanUp();
 	void InitGraph();
-
+	void Log(std::string s);
 
 private:
 	void HandleErrorsOfBcastedCommand(int errorCode, int *message);
