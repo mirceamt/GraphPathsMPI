@@ -12,6 +12,9 @@ public:
 	int GetWEStreet();
 	int GetNSStreet();
 
+	void AddEdge(Node *intersection);
+	bool isExistingEdge(int index);
+
 private:
 	int m_index;
 	int m_WEStreet, m_NSStreet;
