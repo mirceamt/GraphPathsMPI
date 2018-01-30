@@ -13,7 +13,7 @@ public:
 	int GetIntersectionIndex(const std::pair<int, int>& intersection);
 	void FindAllPaths(Node* start, Node* end);
 	bool ExistsNodeInGraph(const std::pair<int, int>& intersection);
-
+	void Reset();
 private:
 	Graph();
 	int GetCurrentIndex();

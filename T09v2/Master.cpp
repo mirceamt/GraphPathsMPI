@@ -1,12 +1,18 @@
 #include "Master.h"
 #include <iostream>
+#include <fstream>
 #include <Windows.h>
 #include "Graph.h"
+#include "mpi.h"
 
 using namespace std;
 
-Master::Master() :
-	m_graph(Graph::GetInstance())
+Master::Master(int rank) :
+	m_graph(Graph::GetInstance()),
+	m_rank(rank)
+{ }
+
+void Master::Init()
 {
 
 }
@@ -39,13 +45,47 @@ void Master::Run()
 	}
 }
 
+void Master::CleanUp()
+{
+
+}
+
 void Master::InitGraph()
 {
+	m_graph->Reset();
+	int message[4];
+	memset(message, 0, 4 * sizeof(int));
+	message[0] = -1; // -1 means that we are sending a menu option 
+	message[1] = 1; // message[1] is the chosen option
+	int error = MPI_Bcast(message, 2, MPI_INT, m_rank, MPI_COMM_WORLD); // m_rank should always be 0 as this code runs in the master process
+	if (error != MPI_SUCCESS)
+	{
+		ShowError(error, "Error broadcasting \"-1, 1\" from Master in InitGraph");
+		exit(0);
+	}
+
 	ClearScreen();
 	ShowInitGraphText();
 	char a[MAX_PATH];
 	cin.getline(a, MAX_PATH);
-	/// TODO
+	ifstream inputFile(a);
+	
+	int nrLines;
+	inputFile >> nrLines;
+	MPI_Bcast(&nrLines, 1, MPI_INT, m_rank, MPI_COMM_WORLD); // m_rank = 0; broadcasting the number of lines in the input file
+
+	int streetNumber, crossStreet1, crossStreet2, streetType;
+	for (int i = 1; i <= nrLines; ++i)
+	{
+		inputFile >> streetNumber >> crossStreet1 >> crossStreet2 >> streetType;
+		message[0] = streetNumber;
+		message[1] = crossStreet1;
+		message[2] = crossStreet2;
+		message[3] = streetType;
+		MPI_Bcast(message, 4, MPI_INT, m_rank, MPI_COMM_WORLD); // m_rank = 0; broadcasting a line from the input file, meaning a street between 2 intersections
+
+		m_graph->AddEdgeAndNodes(streetNumber, crossStreet1, crossStreet2, streetType);
+	}
 }
 
 void Master::FindAllPaths()
@@ -78,4 +118,21 @@ void Master::ClearScreen()
 	{
 		cout << "\n";
 	}
+}
+
+void Master::ShowError(int errorCode, char *errorMsg)
+{
+	cout << "\n\n";
+	cout << "Error: ";
+	if (errorMsg == nullptr)
+	{
+		cout << "NULL";
+	}
+	else
+	{
+		cout << errorMsg;
+	}
+	cout << "\n";
+	cout << "Error code: " << errorCode;
+	cout << "\n\n";
 }
