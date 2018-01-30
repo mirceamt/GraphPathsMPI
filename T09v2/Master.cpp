@@ -3,6 +3,7 @@
 #include <fstream>
 #include <Windows.h>
 #include "Graph.h"
+#include "CommonUtils.h"
 #include "mpi.h"
 
 using namespace std;
@@ -60,7 +61,7 @@ void Master::InitGraph()
 	int error = MPI_Bcast(message, 2, MPI_INT, m_rank, MPI_COMM_WORLD); // m_rank should always be 0 as this code runs in the master process
 	if (error != MPI_SUCCESS)
 	{
-		ShowError(error, "Error broadcasting \"-1, 1\" from Master in InitGraph");
+		CommonUtils::ShowError(error, "Error broadcasting \"-1, 1\" from Master in InitGraph");
 		exit(0);
 	}
 
@@ -118,21 +119,4 @@ void Master::ClearScreen()
 	{
 		cout << "\n";
 	}
-}
-
-void Master::ShowError(int errorCode, char *errorMsg)
-{
-	cout << "\n\n";
-	cout << "Error: ";
-	if (errorMsg == nullptr)
-	{
-		cout << "NULL";
-	}
-	else
-	{
-		cout << errorMsg;
-	}
-	cout << "\n";
-	cout << "Error code: " << errorCode;
-	cout << "\n\n";
 }

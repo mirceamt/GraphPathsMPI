@@ -2,19 +2,20 @@
 
 class Graph;
 
-class Master
+class Slave
 {
 public:
-	Master(int rank);
+	Slave(int rank);
 	void Init();
 	void Run();
 	void CleanUp();
 	void InitGraph();
-	void FindAllPaths();
+
+
 private:
-	void ShowInitGraphText();
-	void ShowMenu();
-	void ClearScreen();
+	void HandleErrorsOfBcastedCommand(int errorCode, int *message);
+
+	const int m_masterRank;
 	Graph* m_graph;
 	int m_rank;
 };
