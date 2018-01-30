@@ -37,8 +37,8 @@ pair<int, int> Graph::GetMapKey(int street1, int street2)
 	// the first street is the even one (i.e. W-E street)
 	// the second street is the odd one (i.e. N-S street)
 	if (street1 % 2 == 0) 
-		return std::make_pair(street1, street2);
-	return std::make_pair(street2, street1);
+		return make_pair(street1, street2);
+	return make_pair(street2, street1);
 }
 
 bool Graph::ExistsNodeInGraph(const std::pair<int, int>& intersection)
@@ -59,8 +59,6 @@ void Graph::AddEdgeAndNodes(int streetNumber, int crossStreet1, int crossStreet2
 	else
 	{
 		firstIntersectionIndex = ++currentIndex;
-		Node::FixIntersectionStreets(firstIntersection);
-
 	    Node *aux = new Node(firstIntersection.first, firstIntersection.second, firstIntersectionIndex);
 		m_nodes.push_back(aux);
 	}
@@ -72,8 +70,6 @@ void Graph::AddEdgeAndNodes(int streetNumber, int crossStreet1, int crossStreet2
 	else
 	{
 		secondIntersectionIndex = ++currentIndex;
-		Node::FixIntersectionStreets(secondIntersection);
-
 		Node *aux = new Node(secondIntersection.first, secondIntersection.second, secondIntersectionIndex);
 		m_nodes.push_back(aux);
 	}

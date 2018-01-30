@@ -14,8 +14,6 @@ public:
 
 	void AddEdge(Node *intersection);
 
-	static void FixIntersectionStreets(std::pair<int, int>& intersection);
-
 private:
 	int m_index;
 	int m_WEStreet, m_NSStreet;

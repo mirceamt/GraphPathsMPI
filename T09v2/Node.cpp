@@ -29,16 +29,6 @@ int Node::GetNSStreet()
 	return m_NSStreet;
 }
 
-void Node::FixIntersectionStreets(pair<int, int>& intersection)
-{
-	// in a intersection, the first street is the WE and the second is the NS
-	// even == WE, odd = NS
-	if (intersection.first % 2 == 1)
-	{
-		swap(intersection.first, intersection.second);
-	}
-}
-
 void Node::AddEdge(Node *intersection)
 {
 	m_edges.push_back(intersection);
