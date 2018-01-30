@@ -73,7 +73,6 @@ void Master::InitGraph()
 	char a[MAX_PATH];
 	auxHelp.getline(a, MAX_PATH);
 	auxHelp.close();
-	Log(string("!!!!!!!!") + a);
 	ClearScreen();
 	ShowInitGraphText(a);
 
