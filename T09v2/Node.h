@@ -13,7 +13,6 @@ public:
 	int GetNSStreet();
 
 	void AddEdge(Node *intersection);
-	bool ExistsEdge(int index);
 
 	static void FixIntersectionStreets(std::pair<int, int>& intersection);
 

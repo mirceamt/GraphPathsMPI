@@ -41,7 +41,6 @@ pair<int, int> Graph::GetMapKey(int street1, int street2)
 	return std::make_pair(street2, street1);
 }
 
-
 bool Graph::ExistsNodeInGraph(const std::pair<int, int>& intersection)
 {
 	return m_streetsToIndex.find(intersection) != m_streetsToIndex.end();
@@ -87,6 +86,11 @@ void Graph::AddEdgeAndNodes(int streetNumber, int crossStreet1, int crossStreet2
 	}
 
 	m_instance->SetCurrentIndex(currentIndex);
+}
+
+const std::vector<Node*>& Graph::GetNodes()
+{
+	return m_nodes;
 }
 
 void Graph::FindAllPaths(Node *start, Node *end) 
