@@ -1,9 +1,12 @@
 #pragma once
 
+class Node;
+
 class Graph
 {
 public:
-	Graph(char *path);
-	FindAllPaths(Node* start, Node* end);
+	Graph();
+	static Graph* GetInstance();
+	void FindAllPaths(Node* start, Node* end);
 
 };
