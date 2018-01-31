@@ -4,7 +4,7 @@
 class Node
 {
 public:
-	Node(int WEStreet, int NSStreet);
+	Node(int WEStreet, int NSStreet, int index);
 	
 	void SetIndex(int newIndex);
 	int GetIndex();
@@ -13,7 +13,6 @@ public:
 	int GetNSStreet();
 
 	void AddEdge(Node *intersection);
-	bool isExistingEdge(int index);
 
 private:
 	int m_index;

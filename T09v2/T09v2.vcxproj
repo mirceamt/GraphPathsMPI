@@ -158,13 +158,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Graph..cpp" />
+    <ClCompile Include="CommonUtils.cpp" />
+    <ClCompile Include="Graph.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Master.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Slave.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="Graph.h" />
+    <ClInclude Include="Master.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Slave.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Resources\input1.txt" />
+    <Text Include="..\Resources\inputFileName.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

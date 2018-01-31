@@ -1,33 +1,44 @@
 #include <iostream>
+#include "Master.h"
+#include "Slave.h"
 #include "mpi.h"
+#include "CommonUtils.h"
 
 using namespace std;
 
 int main(int argc, char* argv[])
 {
-	cout << "argc\t" << argc << "\n";
-	for (int i = 0; argv[i] != NULL; ++i)
-	{
-		cout << "argv[" << i << "]\t" << argv[i] << "\n";
-	}
-	cout << "\n\nDONE\n\n";
+	//cout << "argc\t" << argc << "\n";
+	//for (int i = 0; argv[i] != NULL; ++i)
+	//{
+	//	cout << "argv[" << i << "]\t" << argv[i] << "\n";
+	//}
+	//cout << "\n\nDONE\n\n";
 	
 
 	MPI_Init(&argc, &argv);
+
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+	int nrProcesses = CommonUtils::StringToInt(argv[1]);
+	CommonUtils::SetNrProcesses(nrProcesses);
+
 	if (rank == 0)
 	{
-		char helloStr[] = "Hello World";
-		MPI_Send(helloStr, _countof(helloStr), MPI_CHAR, 1, 0, MPI_COMM_WORLD);
+		Master *master = new Master(rank);
+		master->Init();
+		master->Run();
+		master->CleanUp();
+		delete master;
 	}
-	else if (rank == 1)
+	else
 	{
-		char helloStr[12];
-		MPI_Recv(helloStr, _countof(helloStr), MPI_CHAR, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		cout << "Process " << rank << " received from process 0: ";
-		cout << "\"" << helloStr << "\"";
-		cout << "\n";
+		Slave *slave = new Slave(rank);
+		slave->Init();
+		slave->Run();
+		slave->CleanUp();
+		delete slave;
 	}
 
 	MPI_Finalize();
