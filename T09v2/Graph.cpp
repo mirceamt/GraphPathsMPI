@@ -88,7 +88,13 @@ void Graph::AddEdgeAndNodes(int streetNumber, int crossStreet1, int crossStreet2
 
 void Graph::Reset()
 {
-	// TODO
+	for (auto it: m_nodes) 
+	{
+		delete it;
+	}
+	m_currentIndex = 0;
+	m_streetsToIndex.clear();
+	m_nodes.clear();
 }
 
 const std::vector<Node*>& Graph::GetNodes()
