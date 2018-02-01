@@ -28,7 +28,7 @@ AllPathsFinderMaster::AllPathsFinderMaster()
 void AllPathsFinderMaster::FindAllPaths(int startingNodeIndex, int destinationNodeIndex)
 {
 	m_startingNodeIndex = startingNodeIndex;
-	m_destiantionNodeIndex = destinationNodeIndex;
+	m_destinationNodeIndex = destinationNodeIndex;
 
 	const int totalProcesses = CommonUtils::GetNrProcesses();
 	int nrSlaves = totalProcesses - 1;
@@ -88,7 +88,7 @@ void AllPathsFinderMaster::ShowAllPaths()
 	cout << "All paths from ";
 	m_graph->GetNodes()[m_startingNodeIndex]->ShowNode();
 	cout << " to ";
-	m_graph->GetNodes()[m_destiantionNodeIndex]->ShowNode();
+	m_graph->GetNodes()[m_destinationNodeIndex]->ShowNode();
 	cout << "\n";
 	cout.flush();
 
@@ -121,6 +121,7 @@ void AllPathsFinderMaster::DFSCountPaths(int nodeIndex, int d, const int maxDist
 	{
 		return;
 	}
+
 	if (d == maxDistance)
 	{
 		++m_auxPathsCount;
@@ -130,19 +131,29 @@ void AllPathsFinderMaster::DFSCountPaths(int nodeIndex, int d, const int maxDist
 
 	Node* node = m_graph->GetNodes()[nodeIndex];
 	const vector<Node*>& edges = node->GetEdges();
+	bool couldContinue = false;
 	for (vector<Node*>::const_iterator it = edges.begin(); it != edges.end(); ++it)
 	{
-		DFSCountPaths((*it)->GetIndex(), d + 1, maxDistance);
+		if (!m_viz[(*it)->GetIndex()])
+		{
+			couldContinue = true;
+			DFSCountPaths((*it)->GetIndex(), d + 1, maxDistance);
+		}
+	}
+
+	if (couldContinue == false)
+	{
+		++m_auxShorterPaths;
 	}
 
 	m_viz[nodeIndex] = false;
 }
 
-int AllPathsFinderMaster::GetPathsCount(int startingNodeIndex, int maxDistance)
+void AllPathsFinderMaster::ComputePathsCount(int startingNodeIndex, int maxDistance)
 {
 	m_auxPathsCount = 0;
+	m_auxShorterPaths = 0;
 	DFSCountPaths(startingNodeIndex, 0, maxDistance);
-	return m_auxPathsCount;
 }
 
 void AllPathsFinderMaster::DFSGetStartingPaths(int nodeIndex, int d, const int maxDistance)
@@ -152,6 +163,13 @@ void AllPathsFinderMaster::DFSGetStartingPaths(int nodeIndex, int d, const int m
 		return;
 	}
 	m_auxPathStack[d] = nodeIndex;
+	if (nodeIndex == m_destinationNodeIndex)
+	{
+		// found a path to destination, shorter than maxDistance
+		GraphPath* graphPath = new GraphPath(d, m_auxPathStack);
+		m_allPaths.push_back(graphPath);
+		return;
+	}
 
 	if (d == maxDistance)
 	{
@@ -191,9 +209,20 @@ void AllPathsFinderMaster::FindAllStartingPaths(int startingNodeIndex, int nrSla
 
 	int step = 1;
 	int currentDistance = 1, bestDistance = 1;
+	int oldPathsCount = -1;
 	while (true)
 	{
-		int pathsCount = GetPathsCount(startingNodeIndex, currentDistance);
+		ComputePathsCount(startingNodeIndex, currentDistance);
+		int pathsCount = m_auxPathsCount + m_auxShorterPaths;
+		if (oldPathsCount == pathsCount)
+		{
+			step = step >> 1;
+			currentDistance -= step;
+			bestDistance = currentDistance;
+			break;
+		}
+		oldPathsCount = pathsCount;
+
 		if (pathsCount < nrSlaves)
 		{
 			currentDistance += step;
@@ -209,7 +238,8 @@ void AllPathsFinderMaster::FindAllStartingPaths(int startingNodeIndex, int nrSla
 	currentDistance -= step;
 	while (step > 0)
 	{
-		int pathsCount = GetPathsCount(startingNodeIndex, currentDistance);
+		ComputePathsCount(startingNodeIndex, currentDistance);
+		int pathsCount = m_auxPathsCount + m_auxShorterPaths;
 		if (pathsCount < nrSlaves)
 		{
 			currentDistance += step;

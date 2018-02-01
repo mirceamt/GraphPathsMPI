@@ -118,6 +118,7 @@ void Master::BroadcastOption(int option)
 
 void Master::FindAllPaths()
 {
+	int msg[4];
 	int WEStreet, NSStreet;
 	//get the starting intersection
 	cout << "\n";
@@ -129,11 +130,15 @@ void Master::FindAllPaths()
 	cout << "\tEnter North-South Street: ";
 	cout.flush();
 	cin >> NSStreet;
+	msg[0] = WEStreet; 
+	msg[1] = NSStreet;
 
 	pair<int, int> startingIntersection = make_pair(WEStreet, NSStreet);
 	if (!m_graph->ExistsNodeInGraph(startingIntersection))
 	{
 		cout << "There is no such starting intersection in the city.";
+		msg[0] = msg[1] = msg[2] = msg[3] = -1;
+		MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD);
 		return;
 	}
 
@@ -147,14 +152,19 @@ void Master::FindAllPaths()
 	cout << "\tEnter North-South Street: ";
 	cout.flush();
 	cin >> NSStreet;
+	msg[2] = WEStreet;
+	msg[3] = NSStreet;
 
 	pair<int, int> destinationIntersection = make_pair(WEStreet, NSStreet);
 
 	if (!m_graph->ExistsNodeInGraph(destinationIntersection))
 	{
 		cout << "There is no such destiantion intersection in the city.";
+		msg[0] = msg[1] = msg[2] = msg[3] = -1;
+		MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD);
 		return;
 	}
+	MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD); // send the starting and destiantion intersection to slaves
 
 	int startingIntersectionIndex = m_graph->GetIntersectionIndex(startingIntersection);
 	int destinationIntersetionIndex = m_graph->GetIntersectionIndex(destinationIntersection);

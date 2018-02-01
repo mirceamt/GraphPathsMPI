@@ -27,7 +27,6 @@ GraphPath::GraphPath(const GraphPath& other)
 	}
 }
 
-
 int GraphPath::GetCount() const
 {
 	return m_count;

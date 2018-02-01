@@ -5,6 +5,8 @@
 #include "mpi.h"
 #include "Graph.h"
 #include "Node.h"
+#include "IAllPathsFinder.h"
+#include "AllPathsFinderSlave.h"
 #include "CommonUtils.h"
 
 using namespace std;
@@ -42,6 +44,7 @@ void Slave::Run()
 			InitGraph();
 			break;
 		case 2:
+			FindAllPaths();
 			break;
 		case 3:
 			break;
@@ -57,6 +60,29 @@ void Slave::Run()
 void Slave::CleanUp()
 {
 	Log("Exiting process " + CommonUtils::IntToString(m_rank));
+}
+
+void Slave::FindAllPaths()
+{
+	int msg[4];
+	MPI_Bcast(msg, 4, MPI_INT, m_masterRank, MPI_COMM_WORLD); // receive the starting and destiantion intersection from master
+	if (msg[0] == msg[1] && msg[1] == msg[2] && msg[2] == msg[3] && msg[3] == -1)
+	{
+		CommonUtils::ShowError(-1, "ERROR! Received bad interserctions from master");
+		return;
+	}
+
+	pair<int, int> startingIntersection, destinationIntersection;
+	startingIntersection.first = msg[0]; 
+	startingIntersection.second = msg[1];
+	destinationIntersection.first = msg[2];
+	destinationIntersection.second = msg[3];
+
+	int startingNodeIndex = m_graph->GetIntersectionIndex(startingIntersection);
+	int destinationNodeIndex = m_graph->GetIntersectionIndex(destinationIntersection);
+
+	IAllPathsFinder* allPathsFinder = new AllPathsFinderSlave();
+	allPathsFinder->FindAllPaths(startingNodeIndex, destinationNodeIndex);
 }
 
 void Slave::HandleErrorsOfBcastedCommand(int errorCode, int *message)

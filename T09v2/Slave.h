@@ -14,6 +14,7 @@ public:
 	void Log(std::string s);
 
 private:
+	void FindAllPaths();
 	void HandleErrorsOfBcastedCommand(int errorCode, int *message);
 
 	const int m_masterRank;
