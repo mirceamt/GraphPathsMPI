@@ -93,7 +93,13 @@ int Graph::GetNodesCount() const
 
 void Graph::Reset()
 {
-	// TODO
+	for (auto it: m_nodes) 
+	{
+		delete it;
+	}
+	m_currentIndex = 0;
+	m_streetsToIndex.clear();
+	m_nodes.clear();
 }
 
 const std::vector<Node*>& Graph::GetNodes()
