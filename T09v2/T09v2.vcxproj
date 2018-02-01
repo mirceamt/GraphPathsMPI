@@ -158,19 +158,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AllPathsFinderMaster.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="GraphPath.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Master.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Slave.cpp" />
+    <ClCompile Include="SlavePool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllPathsFinderMaster.h" />
     <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="Graph.h" />
+    <ClInclude Include="GraphPath.h" />
+    <ClInclude Include="IAllPathsFinder.h" />
     <ClInclude Include="Master.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Slave.h" />
+    <ClInclude Include="SlavePool.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Resources\input1.txt" />

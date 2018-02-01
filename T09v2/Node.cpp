@@ -1,4 +1,5 @@
 #include "Node.h"
+#include<iostream>
 #include <vector>
 
 using namespace std;
@@ -32,4 +33,15 @@ int Node::GetNSStreet()
 void Node::AddEdge(Node *intersection)
 {
 	m_edges.push_back(intersection);
+}
+
+const std::vector<Node*>& Node::GetEdges()
+{
+	return m_edges;
+}
+
+void Node::ShowNode()
+{
+	cout << "(" << m_WEStreet << ", " << m_NSStreet << ")";
+	cout.flush();
 }

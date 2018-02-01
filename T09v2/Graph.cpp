@@ -86,6 +86,11 @@ void Graph::AddEdgeAndNodes(int streetNumber, int crossStreet1, int crossStreet2
 	m_instance->SetCurrentIndex(currentIndex);
 }
 
+int Graph::GetNodesCount() const
+{
+	return m_nodes.size();
+}
+
 void Graph::Reset()
 {
 	// TODO

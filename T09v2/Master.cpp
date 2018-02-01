@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include "Graph.h"
 #include "CommonUtils.h"
+#include "IAllPathsFinder.h"
+#include "AllPathsFinderMaster.h"
 #include "mpi.h"
 
 using namespace std;
@@ -73,6 +75,7 @@ void Master::InitGraph()
 	char a[MAX_PATH];
 	auxHelp.getline(a, MAX_PATH);
 	auxHelp.close();
+
 	ClearScreen();
 	ShowInitGraphText(a);
 
@@ -115,7 +118,63 @@ void Master::BroadcastOption(int option)
 
 void Master::FindAllPaths()
 {
+	int WEStreet, NSStreet;
+	//get the starting intersection
+	cout << "\n";
+	cout << "Enter the street numbers of the starting intersection";
+	cout << "\n";
+	cout << "\tEnter West-East Street: ";
+	cout.flush();
+	cin >> WEStreet;
+	cout << "\tEnter North-South Street: ";
+	cout.flush();
+	cin >> NSStreet;
+
+	pair<int, int> startingIntersection = make_pair(WEStreet, NSStreet);
+	if (!m_graph->ExistsNodeInGraph(startingIntersection))
+	{
+		cout << "There is no such starting intersection in the city.";
+		return;
+	}
+
+	//get the destination intersection
+	cout << "\n";
+	cout << "Enter the street numbers of the destination intersection";
+	cout << "\n";
+	cout << "\tEnter West-East Street: ";
+	cout.flush();
+	cin >> WEStreet;
+	cout << "\tEnter North-South Street: ";
+	cout.flush();
+	cin >> NSStreet;
+
+	pair<int, int> destinationIntersection = make_pair(WEStreet, NSStreet);
+
+	if (!m_graph->ExistsNodeInGraph(destinationIntersection))
+	{
+		cout << "There is no such destiantion intersection in the city.";
+		return;
+	}
+
+	int startingIntersectionIndex = m_graph->GetIntersectionIndex(startingIntersection);
+	int destinationIntersetionIndex = m_graph->GetIntersectionIndex(destinationIntersection);
+	IAllPathsFinder* allPathsFinder = new AllPathsFinderMaster();
+	allPathsFinder->FindAllPaths(startingIntersectionIndex, destinationIntersetionIndex);
 	
+	//const vector<GraphPath*>& allPaths = allPathsFinder->GetAllPaths();
+	AllPathsFinderMaster* allPathsFinderMaster = dynamic_cast<AllPathsFinderMaster*>(allPathsFinder);
+	if (allPathsFinderMaster != nullptr)
+	{
+		allPathsFinderMaster->ShowAllPaths();
+	}
+	else
+	{
+		cout << "\n\n\tERROR!!!";
+		cout << "\n\tdynamic_cast failed in Master::FindAllPaths";
+		cout.flush();
+	}
+
+	delete allPathsFinder; // at this point all the GraphPath objects will be gone.
 }
 
 

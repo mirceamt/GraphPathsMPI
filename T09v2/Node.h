@@ -13,6 +13,8 @@ public:
 	int GetNSStreet();
 
 	void AddEdge(Node *intersection);
+	void ShowNode();
+	const std::vector<Node*>& GetEdges();
 
 private:
 	int m_index;

@@ -13,42 +13,78 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Slave">
+      <UniqueIdentifier>{7323aea3-f61c-4520-9909-1069b38b5470}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Master">
+      <UniqueIdentifier>{a9eaa9fd-a91f-4717-8804-c710e9159d98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces">
+      <UniqueIdentifier>{e5e3a867-6f05-4d15-a2b3-374b8a9d4d92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graph">
+      <UniqueIdentifier>{d0c8ea73-1ffc-4173-8210-b20f9d7d0368}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WorkCoordination">
+      <UniqueIdentifier>{3fe2fd7f-28ba-4586-85c2-573f4a67a1b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Master.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Graph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Slave.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CommonUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Slave.cpp">
+      <Filter>Slave</Filter>
+    </ClCompile>
+    <ClCompile Include="Master.cpp">
+      <Filter>Master</Filter>
+    </ClCompile>
+    <ClCompile Include="Graph.cpp">
+      <Filter>Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphPath.cpp">
+      <Filter>Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="AllPathsFinderMaster.cpp">
+      <Filter>Master</Filter>
+    </ClCompile>
+    <ClCompile Include="SlavePool.cpp">
+      <Filter>WorkCoordination</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Graph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Master.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CommonUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Slave.h">
-      <Filter>Header Files</Filter>
+      <Filter>Slave</Filter>
+    </ClInclude>
+    <ClInclude Include="Master.h">
+      <Filter>Master</Filter>
+    </ClInclude>
+    <ClInclude Include="IAllPathsFinder.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Graph.h">
+      <Filter>Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphPath.h">
+      <Filter>Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="AllPathsFinderMaster.h">
+      <Filter>Master</Filter>
+    </ClInclude>
+    <ClInclude Include="SlavePool.h">
+      <Filter>WorkCoordination</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
