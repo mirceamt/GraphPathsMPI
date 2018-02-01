@@ -99,6 +99,19 @@ void Master::InitGraph()
 	}
 	inputFile.close();
 
+	Log("\n\n\n-----------------------------------\n\n\n");
+
+	cout << "map size: ";
+	cout << m_graph->GetMapStreetsToIndex().size();
+	cout.flush();
+	for (auto x : m_graph->GetMapStreetsToIndex())
+	{
+		cout << "(" << x.first.first << ", " << x.first.second << ") - " << x.second << "\n";
+		cout.flush();
+	}
+
+	Log("\n\n\n-----------------------------------\n\n\n");
+
 	Log("Exited InitGraph");
 }
 
@@ -210,7 +223,7 @@ void Master::ShowMenu()
 
 void Master::Log(string s)
 {
-	cout << "Master " << m_rank << ": ";
+	cout << "Master " << CommonUtils::GetMasterRank() << ": ";
 	cout << s;
 	cout << "\n";
 	cout.flush();

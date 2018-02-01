@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#define SEND_MESSAGE_TAG 1
 
 class CommonUtils
 {

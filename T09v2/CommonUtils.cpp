@@ -47,11 +47,14 @@ int CommonUtils::StringToInt(char * s)
 string CommonUtils::IntsToString(int *v, int n)
 {
 	string ret = "";
-	ret += IntToString(v[0]);
-	for (int i = 1; i < n; ++i)
+	if (n > 0)
 	{
-		ret += " ";
-		ret += IntToString(v[i]);
+		ret += IntToString(v[0]);
+		for (int i = 1; i < n; ++i)
+		{
+			ret += " ";
+			ret += IntToString(v[i]);
+		}
 	}
 	return ret;
 }

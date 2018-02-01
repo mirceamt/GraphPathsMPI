@@ -11,11 +11,14 @@
 
 using namespace std;
 
+int Slave::m_rank;
+
 Slave::Slave(int rank) :
 	m_graph(Graph::GetInstance()), 
-	m_rank(rank), 
 	m_masterRank(0)
-{ }
+{ 
+	m_rank = rank;
+}
 
 void Slave::Init()
 {
@@ -45,6 +48,7 @@ void Slave::Run()
 			break;
 		case 2:
 			FindAllPaths();
+			Slave::Log("Returned to Slave::Run");
 			break;
 		case 3:
 			break;

@@ -61,6 +61,7 @@ void Graph::AddEdgeAndNodes(int streetNumber, int crossStreet1, int crossStreet2
 	else
 	{
 		firstIntersectionIndex = ++currentIndex;
+		m_streetsToIndex[firstIntersection] = firstIntersectionIndex;
 	    Node *aux = new Node(firstIntersection.first, firstIntersection.second, firstIntersectionIndex);
 		m_nodes.push_back(aux);
 	}
@@ -72,6 +73,7 @@ void Graph::AddEdgeAndNodes(int streetNumber, int crossStreet1, int crossStreet2
 	else
 	{
 		secondIntersectionIndex = ++currentIndex;
+		m_streetsToIndex[secondIntersection] = secondIntersectionIndex;
 		Node *aux = new Node(secondIntersection.first, secondIntersection.second, secondIntersectionIndex);
 		m_nodes.push_back(aux);
 	}
@@ -91,13 +93,18 @@ int Graph::GetNodesCount() const
 	return m_nodes.size();
 }
 
+const map<pair<int, int>, int>& Graph::GetMapStreetsToIndex()
+{
+	return m_streetsToIndex;
+}
+
 void Graph::Reset()
 {
 	for (auto it: m_nodes) 
 	{
 		delete it;
 	}
-	m_currentIndex = 0;
+	m_currentIndex = -1;
 	m_streetsToIndex.clear();
 	m_nodes.clear();
 }

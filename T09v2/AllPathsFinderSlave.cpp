@@ -2,6 +2,7 @@
 #include "Graph.h"
 #include "GraphPath.h"
 #include "Node.h"
+#include "Slave.h"
 #include <vector>
 #include "mpi.h"
 #include "CommonUtils.h"
@@ -32,6 +33,7 @@ void AllPathsFinderSlave::FindAllPaths(int startingNodeIndex, int destinationNod
 	while (true)
 	{
 		MPI_Recv(msg, 2, MPI_INT, CommonUtils::GetMasterRank(), MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+		Slave::Log("Received from master " + CommonUtils::IntsToString(msg, 2));
 		if (msg[0] == msg[1] && msg[1] == 0) // receieved 0 0
 		{
 			break; // the slave was stopped by the slavePool. enters in waiting command mode.
@@ -45,12 +47,15 @@ void AllPathsFinderSlave::FindAllPaths(int startingNodeIndex, int destinationNod
 			}
 			int startingPathLength = msg[1];
 			int *startingPath = new int[startingPathLength];
+			MPI_Recv(startingPath, startingPathLength, MPI_INT, CommonUtils::GetMasterRank(), MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+			Slave::Log("Received from master " + CommonUtils::IntsToString(startingPath, startingPathLength));
 
 			FindAllPathsToDestination(startingPathLength, startingPath);
 
 			delete[] startingPath;
 		}
 	}
+	Slave::Log("Slave exited waiting for messages from master. Returning to Slave::Run");
 }
 
 const vector<GraphPath*>& AllPathsFinderSlave::GetAllPaths()
@@ -114,10 +119,10 @@ void AllPathsFinderSlave::DFSFindAllPathsToDestination(int nodeIndex, int stackL
 void AllPathsFinderSlave::SendAllPathsToMaster()
 {
 	int msgLength = m_allFoundPaths.size();
-	MPI_Send(&msgLength, 1, MPI_INT, CommonUtils::GetMasterRank(), MPI_ANY_TAG, MPI_COMM_WORLD);
+	MPI_Send(&msgLength, 1, MPI_INT, CommonUtils::GetMasterRank(), SEND_MESSAGE_TAG, MPI_COMM_WORLD);
 	if (msgLength != 0) 
 	{
-		MPI_Send(m_allFoundPaths.data(), msgLength, MPI_INT, CommonUtils::GetMasterRank(), MPI_ANY_TAG, MPI_COMM_WORLD);
+		MPI_Send(m_allFoundPaths.data(), msgLength, MPI_INT, CommonUtils::GetMasterRank(), SEND_MESSAGE_TAG, MPI_COMM_WORLD);
 	}
 }
 

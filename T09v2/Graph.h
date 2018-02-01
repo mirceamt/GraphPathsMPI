@@ -14,6 +14,8 @@ public:
 	void FindAllPaths(Node* start, Node* end);
 	bool ExistsNodeInGraph(const std::pair<int, int>& intersection);
 	int GetNodesCount() const;
+	const std::map<std::pair<int, int>, int>& GetMapStreetsToIndex();
+
 	void Reset();
 private:
 	Graph();

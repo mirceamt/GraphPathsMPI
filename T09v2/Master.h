@@ -12,7 +12,7 @@ public:
 	void CleanUp();
 	void InitGraph();
 	void FindAllPaths();
-	void Log(std::string s);
+	static void Log(std::string s);
 
 private:
 	void BroadcastOption(int option);

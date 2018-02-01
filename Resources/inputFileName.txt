@@ -1,1 +1,1 @@
-..\Resources\input1.txt
+..\Resources\input2.txt

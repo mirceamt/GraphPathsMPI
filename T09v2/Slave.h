@@ -11,7 +11,7 @@ public:
 	void Run();
 	void CleanUp();
 	void InitGraph();
-	void Log(std::string s);
+	static void Log(std::string s);
 
 private:
 	void FindAllPaths();
@@ -19,5 +19,5 @@ private:
 
 	const int m_masterRank;
 	Graph* m_graph;
-	int m_rank;
+	static int m_rank;
 };

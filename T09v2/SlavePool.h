@@ -18,9 +18,10 @@ public:
 	void ChangeSlaveStatus(int slave, SlaveStatus oldStatus, SlaveStatus newStatus);
 	int GetIdleSlavesCount();
 	int GetStoppedSlavesCount();
+	void ShowVectors();
 
 private:
-	int GetIdleSlave();
+	int GetIdleSlave();	
 	int m_totalProcesses;
 	std::vector<int> m_workingSlaves;
 	std::vector<int> m_idleSlaves;

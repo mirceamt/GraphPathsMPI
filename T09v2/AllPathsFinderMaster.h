@@ -14,6 +14,8 @@ public:
 	virtual ~AllPathsFinderMaster();
 	void ShowAllPaths();
 private:
+	void ShowAllStartingPaths();
+	
 	void DFSCountPaths(int startingNodeIndex, int d, const int maxDistance);
 	void ComputePathsCount(int startingNodeIndex, int currentDistance);
 

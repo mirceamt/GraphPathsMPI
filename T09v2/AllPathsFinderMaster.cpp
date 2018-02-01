@@ -2,6 +2,7 @@
 #include "Graph.h"
 #include "Node.h"
 #include "GraphPath.h"
+#include "Master.h"
 #include "CommonUtils.h"
 #include "SlavePool.h"
 #include "mpi.h"
@@ -35,6 +36,8 @@ void AllPathsFinderMaster::FindAllPaths(int startingNodeIndex, int destinationNo
 	int nrSlaves = totalProcesses - 1;
 	FindAllStartingPaths(startingNodeIndex, nrSlaves); // the result is found in m_allStartingPaths
 
+	ShowAllStartingPaths();
+
 	int allStartingPathsIndex = 0;
 	SlavePool *slavePool = new SlavePool();
 
@@ -46,20 +49,31 @@ void AllPathsFinderMaster::FindAllPaths(int startingNodeIndex, int destinationNo
 	}
 	slavePool->StopIdleSlaves(); // in case there are more slaves than jobs; The remaining idle slaves need to be stopped.
 
+	/*Master::Log("NUMBER OF SLAVES: " + CommonUtils::IntToString(nrSlaves));
+	Master::Log("stopped slaves: " + CommonUtils::IntToString(slavePool->GetStoppedSlavesCount()));*/
 	while (slavePool->GetStoppedSlavesCount() != nrSlaves)
 	{
+		//Master::Log("NUMBER OF SLAVES: " + CommonUtils::IntToString(nrSlaves));
+		//Master::Log("stopped slaves: " + CommonUtils::IntToString(slavePool->GetStoppedSlavesCount()));
+
 		int messageLength;
 		MPI_Status status;
 		MPI_Recv(&messageLength, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 		int source = status.MPI_SOURCE;
+		Master::Log("Received message from " + CommonUtils::IntToString(source) + " message: " + CommonUtils::IntToString(messageLength));
 		int *message = nullptr;
 		if (messageLength != 0) // messageLength is 0 when the slave found no paths to destination
 		{
 			message = new int[messageLength];
 			MPI_Recv(message, messageLength, MPI_INT, source, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+			Master::Log("Received message from " + CommonUtils::IntToString(source) + " message: " + CommonUtils::IntsToString(message, messageLength));
 		}
 		
+		//slavePool->ShowVectors();
 		slavePool->ChangeSlaveStatus(source, SlaveStatus::Working, SlaveStatus::Idle);
+		//slavePool->ShowVectors();
+		//cout.flush();
+
 
 		if (allStartingPathsIndex < (int)m_allStartingPaths.size())
 		{
@@ -69,11 +83,15 @@ void AllPathsFinderMaster::FindAllPaths(int startingNodeIndex, int destinationNo
 		}
 		else
 		{
+			Master::Log("Stopping slaves because of lack of jobs");
 			slavePool->StopIdleSlaves();
 		}
+
 		if (messageLength != 0) // process the paths in case the slave generated some paths.
 		{
+			//Master::Log("11111111111111111111111111111111111111111111");
 			ProcessReceivedPaths(messageLength, message);
+			//Master::Log("22222222222222222222222222222222222222222222");
 			delete[] message;
 		}
 	}
@@ -116,6 +134,24 @@ void AllPathsFinderMaster::ShowAllPaths()
 			cout.flush();
 		}
 	}
+}
+
+void AllPathsFinderMaster::ShowAllStartingPaths()
+{
+	cout << "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
+	cout.flush();
+	for (auto& x : m_allStartingPaths)
+	{
+		for (auto y : x)
+		{
+			cout << y << " ";
+			cout.flush();
+		}
+		cout << "\n";
+		cout.flush();
+	}
+	cout << "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n";
+	cout.flush();
 }
 
 const vector<GraphPath*>& AllPathsFinderMaster::GetAllPaths()
