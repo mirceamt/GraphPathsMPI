@@ -6,6 +6,7 @@
 #include "SlavePool.h"
 #include "mpi.h"
 #include <iostream>
+#include <algorithm>
 #include <vector>
 #include <cstring>
 
@@ -37,12 +38,13 @@ void AllPathsFinderMaster::FindAllPaths(int startingNodeIndex, int destinationNo
 	int allStartingPathsIndex = 0;
 	SlavePool *slavePool = new SlavePool();
 
-	for (int i = 1; i <= nrSlaves; ++i)
+	for (int i = 1; i <= min(nrSlaves, (int)m_allStartingPaths.size()); ++i)
 	{
 		vector<int>& startingPath = m_allStartingPaths[allStartingPathsIndex];
 		allStartingPathsIndex++;
 		slavePool->DoJob(startingPath);
 	}
+	slavePool->StopIdleSlaves(); // in case there are more slaves than jobs; The remaining idle slaves need to be stopped.
 
 	while (slavePool->GetStoppedSlavesCount() != nrSlaves)
 	{
@@ -50,8 +52,12 @@ void AllPathsFinderMaster::FindAllPaths(int startingNodeIndex, int destinationNo
 		MPI_Status status;
 		MPI_Recv(&messageLength, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 		int source = status.MPI_SOURCE;
-		int *message = new int[messageLength];
-		MPI_Recv(message, messageLength, MPI_INT, source, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+		int *message = nullptr;
+		if (messageLength != 0) // messageLength is 0 when the slave found no paths to destination
+		{
+			message = new int[messageLength];
+			MPI_Recv(message, messageLength, MPI_INT, source, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+		}
 		
 		slavePool->ChangeSlaveStatus(source, SlaveStatus::Working, SlaveStatus::Idle);
 
@@ -65,10 +71,12 @@ void AllPathsFinderMaster::FindAllPaths(int startingNodeIndex, int destinationNo
 		{
 			slavePool->StopIdleSlaves();
 		}
-		ProcessReceivedPaths(messageLength, message);
-		delete[] message;
+		if (messageLength != 0) // process the paths in case the slave generated some paths.
+		{
+			ProcessReceivedPaths(messageLength, message);
+			delete[] message;
+		}
 	}
-
 	delete slavePool;
 }
 

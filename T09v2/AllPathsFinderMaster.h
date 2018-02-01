@@ -15,7 +15,7 @@ public:
 	void ShowAllPaths();
 private:
 	void DFSCountPaths(int startingNodeIndex, int d, const int maxDistance);
-	void GetPathsCount(int startingNodeIndex, int currentDistance);
+	void ComputePathsCount(int startingNodeIndex, int currentDistance);
 
 	void DFSGetStartingPaths(int startingNodeIndex, int d, const int maxDistance);
 	void PopulateAllStartingPaths(int startingNodeIndex, int bestDistance);
