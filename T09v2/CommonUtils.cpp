@@ -84,3 +84,8 @@ string CommonUtils::IntToString(int x)
 	}
 	return ret;
 }
+
+int CommonUtils::GetMasterRank()
+{
+	return m_masterRank;
+}

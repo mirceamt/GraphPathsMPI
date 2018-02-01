@@ -57,6 +57,9 @@
     <ClCompile Include="SlavePool.cpp">
       <Filter>WorkCoordination</Filter>
     </ClCompile>
+    <ClCompile Include="AllPathsFinderSlave.cpp">
+      <Filter>Slave</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonUtils.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="SlavePool.h">
       <Filter>WorkCoordination</Filter>
+    </ClInclude>
+    <ClInclude Include="AllPathsFinderSlave.h">
+      <Filter>Slave</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

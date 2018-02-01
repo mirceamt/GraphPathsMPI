@@ -159,6 +159,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AllPathsFinderMaster.cpp" />
+    <ClCompile Include="AllPathsFinderSlave.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="GraphPath.cpp" />
@@ -170,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllPathsFinderMaster.h" />
+    <ClInclude Include="AllPathsFinderSlave.h" />
     <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="GraphPath.h" />

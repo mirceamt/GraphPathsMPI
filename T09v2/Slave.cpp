@@ -65,7 +65,7 @@ void Slave::CleanUp()
 void Slave::FindAllPaths()
 {
 	int msg[4];
-	MPI_Bcast(msg, 4, MPI_INT, m_masterRank, MPI_COMM_WORLD); // receive the starting and destiantion intersection from master
+	MPI_Bcast(msg, 4, MPI_INT, m_masterRank, MPI_COMM_WORLD); // receive the starting and destination intersection from master
 	if (msg[0] == msg[1] && msg[1] == msg[2] && msg[2] == msg[3] && msg[3] == -1)
 	{
 		CommonUtils::ShowError(-1, "ERROR! Received bad interserctions from master");
