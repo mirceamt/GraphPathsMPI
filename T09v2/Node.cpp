@@ -20,12 +20,12 @@ int Node::GetIndex()
 	return m_index;
 }
 
-int Node::GetWEStreet()
+int Node::GetWEStreet() const
 {
 	return m_WEStreet;
 }
 
-int Node::GetNSStreet()
+int Node::GetNSStreet() const
 {
 	return m_NSStreet;
 }
@@ -38,6 +38,11 @@ void Node::AddEdge(Node *intersection)
 const std::vector<Node*>& Node::GetEdges()
 {
 	return m_edges;
+}
+
+int Node::GetBlocksBetween(const Node & A, const Node & B)
+{
+	return (abs(A.GetWEStreet() - B.GetWEStreet()) + abs(A.GetNSStreet() - B.GetNSStreet())) / 2;
 }
 
 void Node::ShowNode()

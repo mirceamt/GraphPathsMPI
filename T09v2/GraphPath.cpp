@@ -15,6 +15,7 @@ GraphPath::GraphPath(int n, int* nodesIndices):
 	{
 		m_v[i] = graphNodes[nodesIndices[i]];
 	}
+	ComputeBlocksLength();
 }
 
 GraphPath::GraphPath(const GraphPath& other)
@@ -25,6 +26,7 @@ GraphPath::GraphPath(const GraphPath& other)
 	{
 		m_v[i] = other.m_v[i];
 	}
+	ComputeBlocksLength();
 }
 
 int GraphPath::GetCount() const
@@ -44,6 +46,22 @@ void GraphPath::ShowNodes()
 		m_v[i]->ShowNode();
 		cout << " ";
 		cout.flush();
+	}
+}
+
+int GraphPath::GetBlocksLength()
+{
+	return m_blocksLength;
+}
+
+void GraphPath::ComputeBlocksLength()
+{
+	m_blocksLength = 0;
+	for (int i = 1; i < m_count; ++i)
+	{
+		Node* currentNode = m_v[i];
+		Node* prevNode = m_v[i - 1];
+		m_blocksLength += Node::GetBlocksBetween(*currentNode, *prevNode);
 	}
 }
 
