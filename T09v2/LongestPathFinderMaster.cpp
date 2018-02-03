@@ -117,12 +117,11 @@ void LongestPathFinderMaster::ProcessReceivedPath(int msgLength, int* msg, int b
 
 void LongestPathFinderMaster::ShowLongestPath()
 {
-	cout << "The longest path from ";
-	m_graph->GetNodes()[m_startingNodeIndex]->ShowNode();
+	cout << "-------The longest path from ";
+	m_graph->GetNodes()[m_startingNodeIndex]->ShowNode(false);
 	cout << " to ";
-	m_graph->GetNodes()[m_destinationNodeIndex]->ShowNode();
+	m_graph->GetNodes()[m_destinationNodeIndex]->ShowNode(false);
 	cout << "\n";
-	cout.flush();
 
 	if (m_longestPath == nullptr)
 	{
@@ -130,8 +129,10 @@ void LongestPathFinderMaster::ShowLongestPath()
 		cout.flush();
 		return;
 	}
-	cout << "\n";
-	cout.flush();
+
+	cout << "-------Nodes length: " << m_longestPath->GetCount() << "\n";
+	cout << "-------Blocks length: " << m_longestPath->GetBlocksLength() << "\n";
+	cout << "-------";
 	m_longestPath->ShowNodes();
 	cout << "\n";
 	cout.flush();

@@ -43,10 +43,10 @@ void GraphPath::ShowNodes()
 {
 	for (int i = 0; i < m_count; ++i)
 	{
-		m_v[i]->ShowNode();
+		m_v[i]->ShowNode(false);
 		cout << " ";
-		cout.flush();
 	}
+	cout.flush();
 }
 
 int GraphPath::GetBlocksLength()

@@ -13,7 +13,7 @@ public:
 	int GetNSStreet() const;
 
 	void AddEdge(Node *intersection);
-	void ShowNode();
+	void ShowNode(bool flush = true);
 	const std::vector<Node*>& GetEdges();
 
 	static int GetBlocksBetween(const Node& A, const Node& B);

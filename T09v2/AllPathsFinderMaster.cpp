@@ -111,12 +111,11 @@ void AllPathsFinderMaster::ProcessReceivedPaths(int msgLength, int* msg)
 
 void AllPathsFinderMaster::ShowAllPaths()
 {
-	cout << "All paths from ";
-	m_graph->GetNodes()[m_startingNodeIndex]->ShowNode();
+	cout << "---All paths from ";
+	m_graph->GetNodes()[m_startingNodeIndex]->ShowNode(false);
 	cout << " to ";
-	m_graph->GetNodes()[m_destinationNodeIndex]->ShowNode();
+	m_graph->GetNodes()[m_destinationNodeIndex]->ShowNode(false);
 	cout << "\n";
-	cout.flush();
 
 	if (m_allPaths.empty())
 	{
@@ -127,12 +126,11 @@ void AllPathsFinderMaster::ShowAllPaths()
 	{
 		for (int i = 0; i < (int)m_allPaths.size(); ++i)
 		{
-			cout << "Path " << i + 1 << ": ";
-			cout.flush();
+			cout << "---Path " << i + 1 << ":\t";
 			m_allPaths[i]->ShowNodes();
 			cout << "\n";
-			cout.flush();
 		}
+		cout.flush();
 	}
 }
 

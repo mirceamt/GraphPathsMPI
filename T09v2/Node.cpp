@@ -45,8 +45,11 @@ int Node::GetBlocksBetween(const Node & A, const Node & B)
 	return (abs(A.GetWEStreet() - B.GetWEStreet()) + abs(A.GetNSStreet() - B.GetNSStreet())) / 2;
 }
 
-void Node::ShowNode()
+void Node::ShowNode(bool flush)
 {
 	cout << "(" << m_WEStreet << ", " << m_NSStreet << ")";
-	cout.flush();
+	if (flush)
+	{
+		cout.flush();
+	}
 }
