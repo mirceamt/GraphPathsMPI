@@ -163,6 +163,8 @@
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="GraphPath.cpp" />
+    <ClCompile Include="LongestPathFinderMaster.cpp" />
+    <ClCompile Include="LongestPathFinderSlave.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Master.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -176,6 +178,9 @@
     <ClInclude Include="Graph.h" />
     <ClInclude Include="GraphPath.h" />
     <ClInclude Include="IAllPathsFinder.h" />
+    <ClInclude Include="ILongestPathFinder.h" />
+    <ClInclude Include="LongestPathFinderMaster.h" />
+    <ClInclude Include="LongestPathFinderSlave.h" />
     <ClInclude Include="Master.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Slave.h" />

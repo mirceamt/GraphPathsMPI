@@ -60,6 +60,12 @@
     <ClCompile Include="AllPathsFinderSlave.cpp">
       <Filter>Slave</Filter>
     </ClCompile>
+    <ClCompile Include="LongestPathFinderMaster.cpp">
+      <Filter>Master</Filter>
+    </ClCompile>
+    <ClCompile Include="LongestPathFinderSlave.cpp">
+      <Filter>Slave</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonUtils.h">
@@ -90,6 +96,15 @@
       <Filter>WorkCoordination</Filter>
     </ClInclude>
     <ClInclude Include="AllPathsFinderSlave.h">
+      <Filter>Slave</Filter>
+    </ClInclude>
+    <ClInclude Include="ILongestPathFinder.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="LongestPathFinderMaster.h">
+      <Filter>Master</Filter>
+    </ClInclude>
+    <ClInclude Include="LongestPathFinderSlave.h">
       <Filter>Slave</Filter>
     </ClInclude>
   </ItemGroup>

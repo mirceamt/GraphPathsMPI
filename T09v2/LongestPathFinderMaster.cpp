@@ -58,7 +58,7 @@ void LongestPathFinderMaster::FindLongestPath(int startingNodeIndex, int destina
 
 		int firstMessage[2]; 
 		// can be 0 0 - meaning that the slave found no paths to destination.
-		// x y - meaning that the longest path found to destination hash y blockLength and consists of x intersections.
+		// x y - meaning that the longest path found to destination has y blockLength and consists of x intersections.
 
 		int& messageLength = firstMessage[0];
 		int& blockLength = firstMessage[1];
