@@ -7,6 +7,8 @@
 #include "Node.h"
 #include "IAllPathsFinder.h"
 #include "AllPathsFinderSlave.h"
+#include "ILongestPathFinder.h"
+#include "LongestPathFinderSlave.h"
 #include "CommonUtils.h"
 
 using namespace std;
@@ -48,11 +50,14 @@ void Slave::Run()
 			break;
 		case 2:
 			FindAllPaths();
-			Slave::Log("Returned to Slave::Run");
+			Slave::Log("Returned to Slave::Run from Slave::FindAllPaths");
 			break;
 		case 3:
+			
 			break;
 		case 4:
+			FindLongestPath();
+			Slave::Log("Returned to Slave::Run from Slave::FindLongestPath");
 			break;
 
 		default:
@@ -72,7 +77,7 @@ void Slave::FindAllPaths()
 	MPI_Bcast(msg, 4, MPI_INT, m_masterRank, MPI_COMM_WORLD); // receive the starting and destination intersection from master
 	if (msg[0] == msg[1] && msg[1] == msg[2] && msg[2] == msg[3] && msg[3] == -1)
 	{
-		CommonUtils::ShowError(-1, "ERROR! Received bad interserctions from master");
+		CommonUtils::ShowError(-1, "ERROR! Received bad interserctions from master in Slave::FindAllPaths");
 		return;
 	}
 
@@ -87,6 +92,31 @@ void Slave::FindAllPaths()
 
 	IAllPathsFinder* allPathsFinder = new AllPathsFinderSlave();
 	allPathsFinder->FindAllPaths(startingNodeIndex, destinationNodeIndex);
+	delete allPathsFinder;
+}
+
+void Slave::FindLongestPath()
+{
+	int msg[4];
+	MPI_Bcast(msg, 4, MPI_INT, m_masterRank, MPI_COMM_WORLD); // receive the starting and destination intersection from master
+	if (msg[0] == msg[1] && msg[1] == msg[2] && msg[2] == msg[3] && msg[3] == -1)
+	{
+		CommonUtils::ShowError(-1, "ERROR! Received bad interserctions from master in Slave::FindLongestPath");
+		return;
+	}
+
+	pair<int, int> startingIntersection, destinationIntersection;
+	startingIntersection.first = msg[0];
+	startingIntersection.second = msg[1];
+	destinationIntersection.first = msg[2];
+	destinationIntersection.second = msg[3];
+
+	int startingNodeIndex = m_graph->GetIntersectionIndex(startingIntersection);
+	int destinationNodeIndex = m_graph->GetIntersectionIndex(destinationIntersection);
+
+	ILongestPathFinder* longestPathFinder = new LongestPathFinderSlave();
+	longestPathFinder->FindLongestPath(startingNodeIndex, destinationNodeIndex);
+	delete longestPathFinder;
 }
 
 void Slave::HandleErrorsOfBcastedCommand(int errorCode, int *message)

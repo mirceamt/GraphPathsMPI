@@ -10,11 +10,12 @@ public:
 	void Init();
 	void Run();
 	void CleanUp();
-	void InitGraph();
 	static void Log(std::string s);
 
 private:
+	void InitGraph();
 	void FindAllPaths();
+	void FindLongestPath();
 	void HandleErrorsOfBcastedCommand(int errorCode, int *message);
 
 	const int m_masterRank;

@@ -7,6 +7,8 @@
 #include "CommonUtils.h"
 #include "IAllPathsFinder.h"
 #include "AllPathsFinderMaster.h"
+#include "ILongestPathFinder.h"
+#include "LongestPathFinderMaster.h"
 #include "mpi.h"
 
 using namespace std;
@@ -46,7 +48,7 @@ void Master::Run()
 			//FindShortestPath();
 			break;
 		case 4:
-			//FindLongestPath();
+			FindLongestPath();
 			break;
 		default:
 			break;
@@ -177,7 +179,7 @@ void Master::FindAllPaths()
 		MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD);
 		return;
 	}
-	MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD); // send the starting and destiantion intersection to slaves
+	MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD); // send the starting and destination intersection to slaves
 
 	int startingIntersectionIndex = m_graph->GetIntersectionIndex(startingIntersection);
 	int destinationIntersetionIndex = m_graph->GetIntersectionIndex(destinationIntersection);
@@ -198,6 +200,77 @@ void Master::FindAllPaths()
 	}
 
 	delete allPathsFinder; // at this point all the GraphPath objects will be gone.
+}
+
+void Master::FindLongestPath()
+{
+	int msg[4];
+	int WEStreet, NSStreet;
+	//get the starting intersection
+	cout << "\n";
+	cout << "Enter the street numbers of the starting intersection";
+	cout << "\n";
+	cout << "\tEnter West-East Street: ";
+	cout.flush();
+	cin >> WEStreet;
+	cout << "\tEnter North-South Street: ";
+	cout.flush();
+	cin >> NSStreet;
+	msg[0] = WEStreet;
+	msg[1] = NSStreet;
+
+	pair<int, int> startingIntersection = make_pair(WEStreet, NSStreet);
+	if (!m_graph->ExistsNodeInGraph(startingIntersection))
+	{
+		cout << "There is no such starting intersection in the city.";
+		msg[0] = msg[1] = msg[2] = msg[3] = -1;
+		MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD);
+		return;
+	}
+
+	//get the destination intersection
+	cout << "\n";
+	cout << "Enter the street numbers of the destination intersection";
+	cout << "\n";
+	cout << "\tEnter West-East Street: ";
+	cout.flush();
+	cin >> WEStreet;
+	cout << "\tEnter North-South Street: ";
+	cout.flush();
+	cin >> NSStreet;
+	msg[2] = WEStreet;
+	msg[3] = NSStreet;
+
+	pair<int, int> destinationIntersection = make_pair(WEStreet, NSStreet);
+
+	if (!m_graph->ExistsNodeInGraph(destinationIntersection))
+	{
+		cout << "There is no such destiantion intersection in the city.";
+		msg[0] = msg[1] = msg[2] = msg[3] = -1;
+		MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD);
+		return;
+	}
+	MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD); // send the starting and destination intersection to slaves
+
+	int startingIntersectionIndex = m_graph->GetIntersectionIndex(startingIntersection);
+	int destinationIntersetionIndex = m_graph->GetIntersectionIndex(destinationIntersection);
+
+	ILongestPathFinder* longestPathFinder = new LongestPathFinderMaster();
+	longestPathFinder->FindLongestPath(startingIntersectionIndex, destinationIntersetionIndex);
+
+	LongestPathFinderMaster* longestPathFinderMaster = dynamic_cast<LongestPathFinderMaster*>(longestPathFinder);
+	if (longestPathFinderMaster != nullptr)
+	{
+		longestPathFinderMaster->ShowLongestPath();
+	}
+	else
+	{
+		cout << "\n\n\tERROR!!!";
+		cout << "\n\tdynamic_cast failed in Master::FindLongestPath";
+		cout.flush();
+	}
+
+	delete longestPathFinder; // at this point the longest GraphPath will be gone
 }
 
 

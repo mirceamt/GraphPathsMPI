@@ -42,7 +42,7 @@ void LongestPathFinderSlave::FindLongestPath(int startingNodeIndex, int destinat
 		{
 			if (msg[0] != 1)
 			{
-				CommonUtils::ShowError(-1, "Received unexpected message from master in AllPathsFinderSlave::FindAllPaths");
+				CommonUtils::ShowError(-1, "Received unexpected message from master in LongestPathFinderSlave::FindLongestPath");
 				break;
 			}
 			int startingPathLength = msg[1];

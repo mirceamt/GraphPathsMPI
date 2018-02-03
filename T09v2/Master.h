@@ -10,11 +10,12 @@ public:
 	void Init();
 	void Run();
 	void CleanUp();
-	void InitGraph();
-	void FindAllPaths();
 	static void Log(std::string s);
 
 private:
+	void InitGraph();
+	void FindAllPaths();
+	void FindLongestPath();
 	void BroadcastOption(int option);
 	void ShowInitGraphText(char *s);
 	void ShowMenu();

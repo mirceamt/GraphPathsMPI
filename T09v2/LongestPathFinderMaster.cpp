@@ -117,7 +117,7 @@ void LongestPathFinderMaster::ProcessReceivedPath(int msgLength, int* msg, int b
 
 void LongestPathFinderMaster::ShowLongestPath()
 {
-	cout << "All paths from ";
+	cout << "The longest path from ";
 	m_graph->GetNodes()[m_startingNodeIndex]->ShowNode();
 	cout << " to ";
 	m_graph->GetNodes()[m_destinationNodeIndex]->ShowNode();
@@ -211,6 +211,7 @@ void LongestPathFinderMaster::DFSGetStartingPaths(int nodeIndex, int d, const in
 	if (nodeIndex == m_destinationNodeIndex)
 	{
 		// found a path to destination, shorter than maxDistance
+		// take it into consideration for the search process of the longest path
 		ProcessReceivedPath(d + 1, m_auxPathStack, blocksLength);
 		return;
 	}
