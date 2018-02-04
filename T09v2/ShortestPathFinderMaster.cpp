@@ -4,6 +4,7 @@
 #include "Node.h"
 #include "CommonUtils.h"
 #include "mpi.h"
+#include "Master.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -25,11 +26,13 @@ ShortestPathFinderMaster::ShortestPathFinderMaster(int* nodesIntervals, int node
 	m_localHighNode = m_globalHighNode - m_globalLowNode;
 	m_localNodesCount = m_localHighNode - m_localLowNode;
 	
-	m_known = new bool[m_localNodesCount];
-	m_dist = new int[m_localNodesCount];
-	m_pred = new int[m_localNodesCount];
+	m_roundedNodesCount = m_nodesIntervals[1] - m_nodesIntervals[0];
 
-	for (int i = 0; i < m_localNodesCount; ++i)
+	m_known = new bool[m_roundedNodesCount];
+	m_dist = new int[m_roundedNodesCount];
+	m_pred = new int[m_roundedNodesCount];
+
+	for (int i = 0; i < m_roundedNodesCount; ++i)
 	{
 		m_known[i] = false;
 		m_dist[i] = INF;
@@ -39,8 +42,11 @@ ShortestPathFinderMaster::ShortestPathFinderMaster(int* nodesIntervals, int node
 
 void ShortestPathFinderMaster::FindShortestPath(int startingNodeIndex, int destinationNodeIndex)
 {
-	cout << "\n\n\n\n\t\t\tPuLA Master\n\n\n\n";
-	cout.flush();
+	Master::Log("\nlocalLow: " + CommonUtils::IntToString(m_localLowNode) + "\n" +
+		"localHigh: " + CommonUtils::IntToString(m_localHighNode) + "\n" +
+		"globalLow: " + CommonUtils::IntToString(m_globalLowNode) + "\n" +
+		"globalHigh: " + CommonUtils::IntToString(m_globalHighNode) + "\n"
+	);
 
 	m_startingNodeIndex = startingNodeIndex;
 	m_destinationNodeIndex = destinationNodeIndex;
@@ -48,13 +54,20 @@ void ShortestPathFinderMaster::FindShortestPath(int startingNodeIndex, int desti
 	if (IsGlobalNodeHere(startingNodeIndex))
 	{
 		int localStatingNodeIndex = GlobalToLocal(startingNodeIndex);
-		m_known[localStatingNodeIndex] = true;
+		//m_known[localStatingNodeIndex] = true;
 		m_dist[localStatingNodeIndex] = 0;
+		Master::Log("Starting Node " + CommonUtils::IntToString(startingNodeIndex) + " is here");
+		Master::Log("m_known: " + CommonUtils::BoolsToString(m_known, m_localNodesCount));
+		Master::Log("m_dist: " + CommonUtils::IntsToString(m_dist, m_localNodesCount));
 	}
 
 	for (int i = 0; i < m_graph->GetNodesCount() - 1; ++i)
 	{
+		//Master::Log("Step " + CommonUtils::IntToString(i));
 		FindLocalMin();
+		//Master::Log("Min found: " + CommonUtils::IntToString(m_localMin));
+		//Master::Log("Min position found: " + CommonUtils::IntToString(m_localMinPos));
+
 
 		int localMinMsg[2];
 		int globalMinMsg[2];
@@ -114,6 +127,8 @@ void ShortestPathFinderMaster::FindShortestPath(int startingNodeIndex, int desti
 			break;
 		}
 	}
+	Master::Log("m_dist: " + CommonUtils::IntsToString(m_dist, m_roundedNodesCount));
+	Master::Log("m_pred: " + CommonUtils::IntsToString(m_pred, m_roundedNodesCount));
 
 	GatherResultsInMaster();
 }
@@ -172,12 +187,12 @@ void ShortestPathFinderMaster::FindLocalMin()
 
 int ShortestPathFinderMaster::LocalToGlobal(int nodeIndex)
 {
-	return nodeIndex + m_localLowNode;
+	return nodeIndex + m_globalLowNode;
 }
 
 int ShortestPathFinderMaster::GlobalToLocal(int nodeIndex)
 {
-	return nodeIndex - m_localLowNode;
+	return nodeIndex - m_globalLowNode;
 }
 
 bool ShortestPathFinderMaster::IsGlobalNodeHere(int globalNodeIndex)
@@ -189,37 +204,45 @@ void ShortestPathFinderMaster::GatherResultsInMaster()
 {
 	int infinity = INF;
 
-	int* distancesToSend;
-	int distancesLocalCount;
-	int* predsToSend;
-	int predsLocalCount;
+	int* distancesToSend = m_dist;
+	int* predsToSend = m_pred;
 
-	if (m_localNodesCount == 0)
+	// add -2 to fill in the gap to m_roundedNodesCount
+	// to assure that MPI_Gather doesn't crash 
+	for (int i = m_localNodesCount; i < m_roundedNodesCount; ++i) 
 	{
-		distancesToSend = &infinity;
-		distancesLocalCount = 1;
-
-		predsToSend = &infinity;
-		predsLocalCount = 1;
-	}
-	else
-	{
-		distancesToSend = m_dist;
-		distancesLocalCount = m_localNodesCount;
-
-		predsToSend = m_pred;
-		predsLocalCount = m_localNodesCount;
+		distancesToSend[i] = -2;
+		predsToSend[i] = -2;
 	}
 
-	int recvLength = max(m_graph->GetNodesCount(), CommonUtils::GetNrProcesses());
+	int recvLength = m_roundedNodesCount * CommonUtils::GetNrProcesses();
 	int* gatheredDist = new int[recvLength];
 	int* gatheredPred = new int[recvLength];
+	for (int i = 0; i < recvLength; ++i)
+	{
+		gatheredDist[i] = gatheredPred[i] = 0;
+	}
 
-	MPI_Gather(distancesToSend, distancesLocalCount, MPI_INT, gatheredDist, recvLength, MPI_INT, CommonUtils::GetMasterRank(), MPI_COMM_WORLD);
-	MPI_Gather(predsToSend, predsLocalCount, MPI_INT, gatheredPred, recvLength, MPI_INT, CommonUtils::GetMasterRank(), MPI_COMM_WORLD);
+	int rez1 = MPI_Gather(distancesToSend, m_roundedNodesCount, MPI_INT, gatheredDist, m_roundedNodesCount, MPI_INT, CommonUtils::GetMasterRank(), MPI_COMM_WORLD);
+	int rez2 = MPI_Gather(predsToSend, m_roundedNodesCount, MPI_INT, gatheredPred, m_roundedNodesCount, MPI_INT, CommonUtils::GetMasterRank(), MPI_COMM_WORLD);
+	
+	Master::Log("\n\tGathered pred: " + CommonUtils::IntsToString(gatheredPred, recvLength));
+	Master::Log("\n\tGathered dist: " + CommonUtils::IntsToString(gatheredDist, recvLength));
 
-	delete[] gatheredDist;
-	delete[] gatheredPred;
+	int k = 0;
+	for (int i = 0; i < recvLength; ++i) // remove -2;
+	{
+		if (gatheredDist[i] == -2) // gatheredPred[i] is also -1
+		{
+			++k;
+		}
+		else
+		{
+			gatheredDist[i - k] = gatheredDist[i];
+			gatheredPred[i - k] = gatheredPred[i];
+		}
+	}
+	recvLength -= k;
 
 	if (gatheredPred[m_destinationNodeIndex] != -1)
 	{
@@ -230,6 +253,10 @@ void ShortestPathFinderMaster::GatherResultsInMaster()
 			shortestPathIndices.push_back(currentNodeIndex);
 			currentNodeIndex = gatheredPred[currentNodeIndex];
 		}
+		reverse(shortestPathIndices.begin(), shortestPathIndices.end());
 		m_shortestPath = new GraphPath(shortestPathIndices.size(), shortestPathIndices.data());
 	}
+
+	delete[] gatheredDist;
+	delete[] gatheredPred;
 }

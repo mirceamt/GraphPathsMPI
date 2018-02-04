@@ -10,8 +10,10 @@ public:
 	static void SetNrProcesses(int nrProcesses);
 	static void ShowError(int errorCode, char *errorMsg = nullptr);
 	static int StringToInt(char *s);
-	static std::string IntsToString(int *v, int n);
 	static std::string IntToString(int x);
+	static std::string IntsToString(int *v, int n);
+	static std::string BoolToString(bool x);
+	static std::string BoolsToString(bool * v, int n);
 	static int GetMasterRank();
 private:
 	static const int m_masterRank = 0;

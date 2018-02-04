@@ -59,6 +59,33 @@ string CommonUtils::IntsToString(int *v, int n)
 	return ret;
 }
 
+string CommonUtils::BoolToString(bool x)
+{
+	if (x)
+	{
+		return "1";
+	}
+	else
+	{
+		return "0";
+	}
+}
+
+string CommonUtils::BoolsToString(bool *v, int n)
+{
+	string ret = "";
+	if (n > 0)
+	{
+		ret += BoolToString(v[0]);
+		for (int i = 1; i < n; ++i)
+		{
+			ret += " ";
+			ret += BoolToString(v[i]);
+		}
+	}
+	return ret;
+}
+
 string CommonUtils::IntToString(int x) 
 {
 	string ret = "";

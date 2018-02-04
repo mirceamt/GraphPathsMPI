@@ -27,6 +27,7 @@ private:
 	GraphPath* m_shortestPath = nullptr;
 	int* m_nodesIntervals;
 	int m_nodesIntervalsLength;
+	int m_roundedNodesCount;
 	bool* m_known = nullptr;
 	int* m_dist = nullptr;
 	int* m_pred = nullptr;
