@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #define SEND_MESSAGE_TAG 1
+#define INF 1000000000
 
 class CommonUtils
 {

@@ -18,11 +18,12 @@ int main(int argc, char* argv[])
 
 	MPI_Init(&argc, &argv);
 
+	int nrProcesses;
+	MPI_Comm_size(MPI_COMM_WORLD, &nrProcesses);
+	CommonUtils::SetNrProcesses(nrProcesses);
+	
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-	int nrProcesses = CommonUtils::StringToInt(argv[1]);
-	CommonUtils::SetNrProcesses(nrProcesses);
 
 	if (rank == 0)
 	{

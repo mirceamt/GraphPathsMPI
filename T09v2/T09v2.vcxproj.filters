@@ -66,6 +66,9 @@
     <ClCompile Include="LongestPathFinderSlave.cpp">
       <Filter>Slave</Filter>
     </ClCompile>
+    <ClCompile Include="ShortestPathFinderMaster.cpp">
+      <Filter>Master</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonUtils.h">
@@ -106,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="LongestPathFinderSlave.h">
       <Filter>Slave</Filter>
+    </ClInclude>
+    <ClInclude Include="IShortestPathFinder.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ShortestPathFinderMaster.h">
+      <Filter>Master</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

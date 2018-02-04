@@ -11,6 +11,7 @@ public:
 	void Run();
 	void CleanUp();
 	static void Log(std::string s);
+	static int Rank();
 
 private:
 	void InitGraph();

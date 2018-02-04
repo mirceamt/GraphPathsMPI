@@ -17,7 +17,7 @@ int Slave::m_rank;
 
 Slave::Slave(int rank) :
 	m_graph(Graph::GetInstance()), 
-	m_masterRank(0)
+	m_masterRank(CommonUtils::GetMasterRank())
 { 
 	m_rank = rank;
 }
@@ -144,6 +144,11 @@ void Slave::Log(string s)
 	cout << s.c_str();
 	cout << "\n";
 	cout.flush();
+}
+
+int Slave::Rank()
+{
+	return m_rank;
 }
 
 void Slave::InitGraph()

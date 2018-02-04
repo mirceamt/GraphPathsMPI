@@ -13,10 +13,13 @@
 
 using namespace std;
 
+int Master::m_rank;
+
 Master::Master(int rank) :
-	m_graph(Graph::GetInstance()),
-	m_rank(rank)
-{ }
+	m_graph(Graph::GetInstance())
+{ 
+	m_rank = rank;
+}
 
 void Master::Init()
 {
@@ -45,7 +48,7 @@ void Master::Run()
 			FindAllPaths();
 			break;
 		case 3:
-			//FindShortestPath();
+			FindShortestPath();
 			break;
 		case 4:
 			FindLongestPath();
@@ -54,7 +57,6 @@ void Master::Run()
 			break;
 		}
 		ClearScreen();
-
 	}
 }
 
@@ -131,6 +133,29 @@ void Master::BroadcastOption(int option)
 	}
 }
 
+void Master::ComputeNodeIntervals(int *nodeIntervals)
+{
+	int nrProc = CommonUtils::GetNrProcesses();
+	int nrNodes = m_graph->GetNodesCount();
+	int chunk = nrNodes / nrProc;
+	int remainder = nrNodes % nrProc;
+	const int msgSize = nrProc * 2;
+
+	int lastNode = 0;
+	for (int i = 0; i < nrProc; ++i)
+	{
+		int actualChunk = chunk;
+		if (remainder > 0)
+		{
+			--remainder;
+			actualChunk += 1;
+		}
+		nodeIntervals[2 * i] = lastNode;
+		nodeIntervals[2 * i + 1] = lastNode + actualChunk;
+		lastNode += actualChunk;
+	}
+}
+
 void Master::FindAllPaths()
 {
 	int msg[4];
@@ -200,6 +225,68 @@ void Master::FindAllPaths()
 	}
 
 	delete allPathsFinder; // at this point all the GraphPath objects will be gone.
+}
+
+void Master::FindShortestPath()
+{
+	int msg[4];
+	int WEStreet, NSStreet;
+	//get the starting intersection
+	cout << "\n";
+	cout << "Enter the street numbers of the starting intersection";
+	cout << "\n";
+	cout << "\tEnter West-East Street: ";
+	cout.flush();
+	cin >> WEStreet;
+	cout << "\tEnter North-South Street: ";
+	cout.flush();
+	cin >> NSStreet;
+	msg[0] = WEStreet;
+	msg[1] = NSStreet;
+
+	pair<int, int> startingIntersection = make_pair(WEStreet, NSStreet);
+	if (!m_graph->ExistsNodeInGraph(startingIntersection))
+	{
+		cout << "There is no such starting intersection in the city.";
+		msg[0] = msg[1] = msg[2] = msg[3] = -1;
+		MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD);
+		return;
+	}
+
+	//get the destination intersection
+	cout << "\n";
+	cout << "Enter the street numbers of the destination intersection";
+	cout << "\n";
+	cout << "\tEnter West-East Street: ";
+	cout.flush();
+	cin >> WEStreet;
+	cout << "\tEnter North-South Street: ";
+	cout.flush();
+	cin >> NSStreet;
+	msg[2] = WEStreet;
+	msg[3] = NSStreet;
+
+	pair<int, int> destinationIntersection = make_pair(WEStreet, NSStreet);
+
+	if (!m_graph->ExistsNodeInGraph(destinationIntersection))
+	{
+		cout << "There is no such destiantion intersection in the city.";
+		msg[0] = msg[1] = msg[2] = msg[3] = -1;
+		MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD);
+		return;
+	}
+	MPI_Bcast(msg, 4, MPI_INT, m_rank, MPI_COMM_WORLD); // send the starting and destination intersection to slaves
+
+	int nodeIntervalsLength = CommonUtils::GetNrProcesses() * 2;
+	int *nodeIntervals = new int[nodeIntervalsLength];
+	ComputeNodeIntervals(nodeIntervals);
+	MPI_Bcast(nodeIntervals, nodeIntervalsLength, MPI_INT, CommonUtils::GetMasterRank(), MPI_COMM_WORLD);
+
+	int startingIntersectionIndex = m_graph->GetIntersectionIndex(startingIntersection);
+	int destinationIntersetionIndex = m_graph->GetIntersectionIndex(destinationIntersection);
+
+
+	delete[] nodeIntervals;
 }
 
 void Master::FindLongestPath()
@@ -273,7 +360,6 @@ void Master::FindLongestPath()
 	delete longestPathFinder; // at this point the longest GraphPath will be gone
 }
 
-
 void Master::ShowInitGraphText(char *s)
 {
 	cout << "\nReading from init path: " << s << "\n";
@@ -300,6 +386,11 @@ void Master::Log(string s)
 	cout << s;
 	cout << "\n";
 	cout.flush();
+}
+
+int Master::Rank()
+{
+	return m_rank;
 }
 
 void Master::ClearScreen()
