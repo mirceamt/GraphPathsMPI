@@ -9,6 +9,8 @@
 #include "AllPathsFinderMaster.h"
 #include "ILongestPathFinder.h"
 #include "LongestPathFinderMaster.h"
+#include "IShortestPathFinder.h"
+#include "ShortestPathFinderMaster.h"
 #include "mpi.h"
 
 using namespace std;
@@ -283,10 +285,19 @@ void Master::FindShortestPath()
 	MPI_Bcast(nodeIntervals, nodeIntervalsLength, MPI_INT, CommonUtils::GetMasterRank(), MPI_COMM_WORLD);
 
 	int startingIntersectionIndex = m_graph->GetIntersectionIndex(startingIntersection);
-	int destinationIntersetionIndex = m_graph->GetIntersectionIndex(destinationIntersection);
+	int destinationIntersectionIndex = m_graph->GetIntersectionIndex(destinationIntersection);
 
+	IShortestPathFinder *shortestPathFinder = new ShortestPathFinderMaster(nodeIntervals, nodeIntervalsLength, m_rank);
+	shortestPathFinder->FindShortestPath(startingIntersectionIndex, destinationIntersectionIndex);
+	
+	ShortestPathFinderMaster* shortestPathFinderMaster = dynamic_cast<ShortestPathFinderMaster*>(shortestPathFinder);
+	if (shortestPathFinderMaster != nullptr)
+	{
+		shortestPathFinderMaster->ShowShortestPath();
+	}
 
 	delete[] nodeIntervals;
+	delete shortestPathFinder;
 }
 
 void Master::FindLongestPath()

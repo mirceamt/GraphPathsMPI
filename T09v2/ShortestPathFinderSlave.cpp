@@ -1,4 +1,4 @@
-#include "ShortestPathFinderMaster.h"
+#include "ShortestPathFinderSlave.h"
 #include "Graph.h"
 #include "GraphPath.h"
 #include "Node.h"
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-ShortestPathFinderMaster::ShortestPathFinderMaster(int* nodesIntervals, int nodesIntervalsLength, int rank) :
+ShortestPathFinderSlave::ShortestPathFinderSlave(int* nodesIntervals, int nodesIntervalsLength, int rank) :
 	m_rank(rank),
 	m_graph(Graph::GetInstance())
 {
@@ -24,7 +24,7 @@ ShortestPathFinderMaster::ShortestPathFinderMaster(int* nodesIntervals, int node
 	m_localLowNode = 0;
 	m_localHighNode = m_globalHighNode - m_globalLowNode;
 	m_localNodesCount = m_localHighNode - m_localLowNode;
-	
+
 	m_known = new bool[m_localNodesCount];
 	m_dist = new int[m_localNodesCount];
 	m_pred = new int[m_localNodesCount];
@@ -37,10 +37,11 @@ ShortestPathFinderMaster::ShortestPathFinderMaster(int* nodesIntervals, int node
 	}
 }
 
-void ShortestPathFinderMaster::FindShortestPath(int startingNodeIndex, int destinationNodeIndex)
+void ShortestPathFinderSlave::FindShortestPath(int startingNodeIndex, int destinationNodeIndex)
 {
-	cout << "\n\n\n\n\t\t\tPuLA Master\n\n\n\n";
+	cout << "\n\n\n\n\t\t\tPuLA Slave\n\n\n\n";
 	cout.flush();
+
 
 	m_startingNodeIndex = startingNodeIndex;
 	m_destinationNodeIndex = destinationNodeIndex;
@@ -70,13 +71,13 @@ void ShortestPathFinderMaster::FindShortestPath(int startingNodeIndex, int desti
 			localMinMsg[0] = INF;
 			localMinMsg[1] = INF;
 		}
-		
+
 		MPI_Allreduce(localMinMsg, globalMinMsg, 1, MPI_2INT, MPI_MINLOC, MPI_COMM_WORLD);
 
 		int globalMinDist = globalMinMsg[0];
 		int globalMinDistPos = globalMinMsg[1];
 
-		
+
 		if (globalMinDist != INF && globalMinDistPos != INF)
 		{
 			if (globalMinDistPos == destinationNodeIndex)
@@ -118,42 +119,16 @@ void ShortestPathFinderMaster::FindShortestPath(int startingNodeIndex, int desti
 	GatherResultsInMaster();
 }
 
-void ShortestPathFinderMaster::ShowShortestPath()
-{
-	cout << "-------The longest path from ";
-	m_graph->GetNodes()[m_startingNodeIndex]->ShowNode(false);
-	cout << " to ";
-	m_graph->GetNodes()[m_destinationNodeIndex]->ShowNode(false);
-	cout << "\n";
 
-	if (m_shortestPath == nullptr)
-	{
-		cout << "\nNo path found!\n";
-		cout.flush();
-		return;
-	}
-
-	cout << "-------Nodes length: " << m_shortestPath->GetCount() << "\n";
-	cout << "-------Blocks length: " << m_shortestPath->GetBlocksLength() << "\n";
-	cout << "-------";
-	m_shortestPath->ShowNodes();
-	cout << "\n";
-	cout.flush();
-}
-
-ShortestPathFinderMaster::~ShortestPathFinderMaster()
+ShortestPathFinderSlave::~ShortestPathFinderSlave()
 {
 	delete[] m_nodesIntervals;
 	delete[] m_known;
 	delete[] m_dist;
 	delete[] m_pred;
-	if (m_shortestPath != nullptr)
-	{
-		delete m_shortestPath;
-	}
 }
 
-void ShortestPathFinderMaster::FindLocalMin()
+void ShortestPathFinderSlave::FindLocalMin()
 {
 	m_localMin = INF;
 	m_localMinPos = INF;
@@ -170,22 +145,22 @@ void ShortestPathFinderMaster::FindLocalMin()
 	}
 }
 
-int ShortestPathFinderMaster::LocalToGlobal(int nodeIndex)
+int ShortestPathFinderSlave::LocalToGlobal(int nodeIndex)
 {
 	return nodeIndex + m_localLowNode;
 }
 
-int ShortestPathFinderMaster::GlobalToLocal(int nodeIndex)
+int ShortestPathFinderSlave::GlobalToLocal(int nodeIndex)
 {
 	return nodeIndex - m_localLowNode;
 }
 
-bool ShortestPathFinderMaster::IsGlobalNodeHere(int globalNodeIndex)
+bool ShortestPathFinderSlave::IsGlobalNodeHere(int globalNodeIndex)
 {
 	return m_globalLowNode <= globalNodeIndex && globalNodeIndex < m_globalHighNode;
 }
 
-void ShortestPathFinderMaster::GatherResultsInMaster()
+void ShortestPathFinderSlave::GatherResultsInMaster()
 {
 	int infinity = INF;
 
@@ -220,16 +195,4 @@ void ShortestPathFinderMaster::GatherResultsInMaster()
 
 	delete[] gatheredDist;
 	delete[] gatheredPred;
-
-	if (gatheredPred[m_destinationNodeIndex] != -1)
-	{
-		vector<int> shortestPathIndices;
-		int currentNodeIndex = m_destinationNodeIndex;
-		while (currentNodeIndex != -1)
-		{
-			shortestPathIndices.push_back(currentNodeIndex);
-			currentNodeIndex = gatheredPred[currentNodeIndex];
-		}
-		m_shortestPath = new GraphPath(shortestPathIndices.size(), shortestPathIndices.data());
-	}
 }

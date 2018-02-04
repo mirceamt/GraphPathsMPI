@@ -9,6 +9,8 @@
 #include "AllPathsFinderSlave.h"
 #include "ILongestPathFinder.h"
 #include "LongestPathFinderSlave.h"
+#include "IShortestPathFinder.h"
+#include "ShortestPathFinderSlave.h"
 #include "CommonUtils.h"
 
 using namespace std;
@@ -53,7 +55,7 @@ void Slave::Run()
 			Slave::Log("Returned to Slave::Run from Slave::FindAllPaths");
 			break;
 		case 3:
-			
+			FindShortestPath();
 			break;
 		case 4:
 			FindLongestPath();
@@ -93,6 +95,36 @@ void Slave::FindAllPaths()
 	IAllPathsFinder* allPathsFinder = new AllPathsFinderSlave();
 	allPathsFinder->FindAllPaths(startingNodeIndex, destinationNodeIndex);
 	delete allPathsFinder;
+}
+
+void Slave::FindShortestPath()
+{
+	int msg[4];
+	MPI_Bcast(msg, 4, MPI_INT, m_masterRank, MPI_COMM_WORLD); // receive the starting and destination intersection from master
+	if (msg[0] == msg[1] && msg[1] == msg[2] && msg[2] == msg[3] && msg[3] == -1)
+	{
+		CommonUtils::ShowError(-1, "ERROR! Received bad interserctions from master in Slave::FindAllPaths");
+		return;
+	}
+
+	pair<int, int> startingIntersection, destinationIntersection;
+	startingIntersection.first = msg[0];
+	startingIntersection.second = msg[1];
+	destinationIntersection.first = msg[2];
+	destinationIntersection.second = msg[3];
+
+	int startingNodeIndex = m_graph->GetIntersectionIndex(startingIntersection);
+	int destinationNodeIndex = m_graph->GetIntersectionIndex(destinationIntersection);
+
+	int nodeIntervalsLength = CommonUtils::GetNrProcesses() * 2;
+	int *nodeIntervals = new int[nodeIntervalsLength];
+	MPI_Bcast(nodeIntervals, nodeIntervalsLength, MPI_INT, CommonUtils::GetMasterRank(), MPI_COMM_WORLD); // receive nodeIntervals from Master
+
+	IShortestPathFinder* shortestPathFinder = new ShortestPathFinderSlave(nodeIntervals, nodeIntervalsLength, m_rank);
+	shortestPathFinder->FindShortestPath(startingNodeIndex, destinationNodeIndex);
+
+	delete[] nodeIntervals;
+	delete shortestPathFinder;
 }
 
 void Slave::FindLongestPath()

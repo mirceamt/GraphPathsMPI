@@ -16,6 +16,7 @@ public:
 private:
 	void InitGraph();
 	void FindAllPaths();
+	void FindShortestPath();
 	void FindLongestPath();
 	void HandleErrorsOfBcastedCommand(int errorCode, int *message);
 

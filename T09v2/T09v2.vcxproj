@@ -169,6 +169,7 @@
     <ClCompile Include="Master.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="ShortestPathFinderMaster.cpp" />
+    <ClCompile Include="ShortestPathFinderSlave.cpp" />
     <ClCompile Include="Slave.cpp" />
     <ClCompile Include="SlavePool.cpp" />
   </ItemGroup>
@@ -186,6 +187,7 @@
     <ClInclude Include="Master.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="ShortestPathFinderMaster.h" />
+    <ClInclude Include="ShortestPathFinderSlave.h" />
     <ClInclude Include="Slave.h" />
     <ClInclude Include="SlavePool.h" />
   </ItemGroup>
